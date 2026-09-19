@@ -29,12 +29,18 @@ export default function LoginPage() {
       }
 
       localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify({
+        id: response.data.id,
+        full_name: response.data.full_name,
+        email: response.data.email,
+        role: response.data.role
+      }));
 
       navigate('/home');
     } catch (error) {
-      error.response && error.response.data && error.response.data.message
-        ? alert(error.response.data.message)
-        : alert('Passowrd and Email is incorrect');
+       if (error.response) {
+        alert(error.response.data.message);
+    }
     }
 
   }

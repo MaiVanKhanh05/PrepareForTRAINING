@@ -27,12 +27,12 @@ public class JwtService {
 
     public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getid());
+        claims.put("userId", user.getId());
         claims.put("email", user.getEmail());
         claims.put("role", user.getRole());
 
         return Jwts.builder()
-                .subject(user.getid())
+                .subject(user.getId())
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole())
                 .issuedAt(new Date())

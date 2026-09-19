@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Folder, 
-  FileText, 
-  Users, 
-  Settings, 
-  Search, 
-  Bell, 
-  Plus, 
-  Upload, 
-  MoreVertical, 
-  Layout, 
+import {
+  Folder,
+  FileText,
+  Users,
+  Settings,
+  Search,
+  Bell,
+  Plus,
+  Upload,
+  MoreVertical,
+  Layout,
   MessageSquare,
   FileImage,
   FileVideo,
@@ -35,6 +35,8 @@ function Home() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const navigate = useNavigate();
 
+  const user = JSON.parse(localStorage.getItem('user'));
+
 
   const getFileIcon = (type) => {
     switch (type) {
@@ -47,10 +49,11 @@ function Home() {
 
 
   const handleLogout = () => {
-  localStorage.removeItem('token');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
 
-  navigate('/login');
-};
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -62,37 +65,37 @@ function Home() {
           </div>
           <span className="text-xl font-bold text-slate-800 tracking-tight">DocuFlow</span>
         </div>
-        
+
         <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
-          <button 
+          <button
             onClick={() => setActiveTab('dashboard')}
             className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'dashboard' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
           >
             <Layout className={`w-5 h-5 mr-3 ${activeTab === 'dashboard' ? 'text-indigo-600' : 'text-slate-400'}`} />
             Dashboard
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('projects')}
             className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'projects' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
           >
             <Folder className={`w-5 h-5 mr-3 ${activeTab === 'projects' ? 'text-indigo-600' : 'text-slate-400'}`} />
             Projects
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('documents')}
             className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'documents' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
           >
             <FileText className={`w-5 h-5 mr-3 ${activeTab === 'documents' ? 'text-indigo-600' : 'text-slate-400'}`} />
             Documents
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('team')}
             className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'team' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
           >
             <Users className={`w-5 h-5 mr-3 ${activeTab === 'team' ? 'text-indigo-600' : 'text-slate-400'}`} />
             Team members
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('chat')}
             className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'chat' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
           >
@@ -106,7 +109,7 @@ function Home() {
             <Settings className="w-5 h-5 mr-3 text-slate-400" />
             Settings
           </button>
-          <button 
+          <button
             onClick={handleLogout}
             className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors mt-2"
           >
@@ -125,14 +128,14 @@ function Home() {
               <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
               </span>
-              <input 
-                type="text" 
-                placeholder="Search projects, documents, team members..." 
+              <input
+                type="text"
+                placeholder="Search projects, documents, team members..."
                 className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg leading-5 bg-slate-50/50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 sm:text-sm transition-all duration-200 shadow-sm"
               />
             </div>
           </div>
-          
+
           <div className="ml-4 flex items-center space-x-5">
             <button className="p-2 text-slate-400 hover:text-slate-600 relative transition-colors rounded-full hover:bg-slate-100">
               <Bell className="h-5 w-5" />
@@ -140,14 +143,14 @@ function Home() {
             </button>
             <div className="flex items-center space-x-3 border-l border-slate-200 pl-5">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-semibold text-slate-900 leading-none">Alex Johnson</p>
-                <p className="text-xs text-indigo-600 font-medium mt-1">Admin</p>
+                <p className="text-sm font-semibold text-slate-900 leading-none">{user.full_name}</p>
+                <p className="text-xs text-indigo-600 font-medium mt-1">{user.email}</p>
               </div>
               <button className="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 rounded-full">
-                <img 
-                  className="h-9 w-9 rounded-full object-cover border border-slate-200 shadow-sm hover:shadow-md transition-shadow" 
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" 
-                  alt="User avatar" 
+                <img
+                  className="h-9 w-9 rounded-full object-cover border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt="User avatar"
                 />
               </button>
             </div>
@@ -157,7 +160,7 @@ function Home() {
         {/* Dashboard Content */}
         <div className="flex-1 overflow-auto p-6 md:p-8">
           <div className="max-w-6xl mx-auto space-y-8 pb-12">
-            
+
             {/* Welcome Section */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div>
@@ -212,7 +215,7 @@ function Home() {
               {/* Decorative elements */}
               <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl mix-blend-overlay"></div>
               <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-48 h-48 bg-indigo-400 opacity-20 rounded-full blur-2xl"></div>
-              
+
               <div className="relative z-10 md:w-2/3 mb-6 md:mb-0">
                 <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-medium text-indigo-100 mb-4 backdrop-blur-sm">
                   ✨ AI Powered
@@ -247,10 +250,9 @@ function Home() {
                         <div>
                           <h3 className="text-base font-semibold text-slate-900 line-clamp-1 group-hover:text-indigo-700 transition-colors">{project.name}</h3>
                           <div className="mt-1">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold tracking-wide ${
-                              project.role === 'Admin' ? 'bg-fuchsia-100 text-fuchsia-700' : 
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold tracking-wide ${project.role === 'Admin' ? 'bg-fuchsia-100 text-fuchsia-700' :
                               project.role === 'Owner' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-700'
-                            }`}>
+                              }`}>
                               {project.role}
                             </span>
                           </div>
@@ -260,7 +262,7 @@ function Home() {
                         <MoreVertical className="w-4 h-4" />
                       </button>
                     </div>
-                    
+
                     <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500">
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center tooltip" title="Members">

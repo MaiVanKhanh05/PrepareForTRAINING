@@ -1,24 +1,24 @@
-package com.example.backend.DTO;
+package com.example.backend.DTO.Authentication;
 
 public class LoginResponse {
     private String token;
     private String id;
     private String email;
     private String role;
-    private String fullName;
+    private String full_name;
 
-    public LoginResponse(String token, String id, String email, String role, String fullName) {
+    public LoginResponse(String token, String id, String email, String role, String full_name) {
         this.token = token;
         this.id = id;
         this.email = email;
         this.role = role;
-        this.fullName = fullName;
+        this.full_name = full_name;
     }
-    public String getFullName() {
-        return fullName;
+    public String getFull_name() {
+        return full_name;
     }
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setFull_name(String full_name) {
+        this.full_name = full_name;
     }
     public LoginResponse() {
     }
