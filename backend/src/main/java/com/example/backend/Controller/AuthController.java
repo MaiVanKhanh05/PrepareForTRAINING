@@ -21,7 +21,7 @@ public class AuthController {
     }
     
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request){//Spring sẽ lấy JSON từ request: chuyển thành object LoginRequest.
+    public LoginResponse login(@RequestBody LoginRequest request){//@RequestBody lấy JSON từ request chuyển thành object LoginRequest.
         return authService.login(request);
     }
     
