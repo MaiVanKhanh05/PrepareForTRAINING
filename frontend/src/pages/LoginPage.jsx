@@ -35,12 +35,19 @@ export default function LoginPage() {
         email: response.data.email,
         role: response.data.role
       }));
-
-      navigate('/home');
+      if (response.data.role == "ADMIN") {
+        navigate('/admin');
+      }
+      else if (response.data.role == "OWNER") {
+        navigate('/owner');
+      }
+      else {
+        navigate('/home');
+      }
     } catch (error) {
-       if (error.response) {
+      if (error.response) {
         alert(error.response.data.message);
-    }
+      }
     }
 
   }

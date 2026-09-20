@@ -2,6 +2,12 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import Home from './pages/Home';
+import Admin from './pages/Admin';
+import Dashboard from './pages/admin/Dashboard';
+import UserManagement from './pages/admin/UserManagement';
+import OwnerLayout from './pages/OwnerLayout';
+import Projects from './pages/owner/Projects';
+import Team from './pages/owner/Team';
 
 function App() {
   return (
@@ -12,6 +18,18 @@ function App() {
         {/* Redirect root to login for now */}
         <Route path="*" element={<Navigate to="/login" replace />} />
         <Route path="/home" element={<Home />} />
+        
+        <Route path="/admin" element={<Admin />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="users" element={<UserManagement />} />
+        </Route>
+
+        <Route path="/owner" element={<OwnerLayout />}>
+          <Route index element={<Navigate to="projects" replace />} />
+          <Route path="projects" element={<Projects />} />
+          <Route path="team" element={<Team />} />
+        </Route>
 
       </Routes>
     </BrowserRouter>

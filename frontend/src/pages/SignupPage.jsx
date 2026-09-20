@@ -41,7 +41,12 @@ export default function SignupPage() {
         role: response.data.role
       }));
 
-      navigate('/home');
+      if (response.data.role == "ADMIN") {
+        navigate('/admin');
+      }
+      else {
+        navigate('/home');
+      }
     } catch (error) {
       if (error.response) {
         alert(error.response.data.message);

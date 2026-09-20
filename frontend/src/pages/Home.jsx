@@ -89,13 +89,6 @@ function Home() {
             Documents
           </button>
           <button
-            onClick={() => setActiveTab('team')}
-            className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'team' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
-          >
-            <Users className={`w-5 h-5 mr-3 ${activeTab === 'team' ? 'text-indigo-600' : 'text-slate-400'}`} />
-            Team members
-          </button>
-          <button
             onClick={() => setActiveTab('chat')}
             className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'chat' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
           >
@@ -171,10 +164,6 @@ function Home() {
                 <button className="inline-flex items-center justify-center px-4 py-2.5 border border-slate-200 shadow-sm text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 transition-all active:scale-95">
                   <Upload className="w-4 h-4 mr-2 text-slate-500" />
                   Upload Document
-                </button>
-                <button className="inline-flex items-center justify-center px-4 py-2.5 border border-transparent shadow-md shadow-indigo-500/20 text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95">
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Project
                 </button>
               </div>
             </div>

@@ -40,5 +40,11 @@ public class JwtService {
                 .signWith(getKey())
                 .compact();
     }
-
+    public io.jsonwebtoken.Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
 }
