@@ -1,5 +1,6 @@
 package com.example.backend.Entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -11,6 +12,8 @@ public class User {
     private String id;
     private String email;
     private String password;
+    
+     @Column(name = "full_name")
     private String full_name;
     private String role;
 

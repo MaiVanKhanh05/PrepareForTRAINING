@@ -7,6 +7,7 @@ import Dashboard from './pages/admin/Dashboard';
 import UserManagement from './pages/admin/UserManagement';
 import OwnerLayout from './pages/OwnerLayout';
 import Projects from './pages/owner/Projects';
+import ProjectDetail from './pages/owner/ProjectDetail';
 import Team from './pages/owner/Team';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         <Route path="/owner" element={<OwnerLayout />}>
           <Route index element={<Navigate to="projects" replace />} />
           <Route path="projects" element={<Projects />} />
+          <Route path="projects/:id" element={<ProjectDetail />} />
           <Route path="team" element={<Team />} />
         </Route>
 

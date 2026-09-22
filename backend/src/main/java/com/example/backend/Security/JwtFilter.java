@@ -47,6 +47,9 @@ public class JwtFilter extends OncePerRequestFilter {
             
             String userId = claims.getSubject();
             String role = claims.get("role", String.class);
+            if (role != null) {
+                role = role.toUpperCase();
+            }
             System.out.println(">>> JwtFilter - userId: " + userId + ", role: " + role);
             System.out.println(">>> JwtFilter - Setting authority: ROLE_" + role);
 

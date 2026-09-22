@@ -1,21 +1,31 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import OwnerSidebar from '../components/owner/OwnerSidebar';
 import OwnerTopbar from '../components/owner/OwnerTopbar';
+import axios from 'axios';
 
 const OwnerLayout = () => {
+
     const navigate = useNavigate();
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            navigate('/login');
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/login');
+            }
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                navigate('/login');
+            }
+        } catch (error) {
+            console.log(error);
         }
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user) {
-            navigate('/login');
-        }
-    }, [navigate]);
+
+
+
+    }, []);
+
 
     return (
         <div className="flex h-screen bg-zinc-50 overflow-hidden font-sans">
