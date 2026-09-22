@@ -31,5 +31,26 @@ public interface ProjectRepository
     """)
     List<ProjectResponse> findAllWithMemberCount();
 
+    @Query("""
+        SELECT new com.example.backend.DTO.Project.ProjectResponse(
+            p.id,
+            p.name,
+            p.description,
+            p.owner.full_name,
+            COUNT(pm.id),
+            p.createdAt
+        )
+        FROM Project p
+        LEFT JOIN ProjectMember pm
+            ON pm.projectId = p.id
+        WHERE p.id = :id
+        GROUP BY
+            p.id,
+            p.name,
+            p.description,
+            p.owner.full_name,
+            p.createdAt
+    """)
+    ProjectResponse findProjectById(String id);
     
 }

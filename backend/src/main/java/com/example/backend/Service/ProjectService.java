@@ -6,41 +6,61 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.example.backend.DTO.Project.CreateProjectRequest;
 import com.example.backend.DTO.Project.ProjectResponse;
 import com.example.backend.Entity.Project;
+import com.example.backend.Entity.ProjectMember;
+import com.example.backend.Exception.AppException;
+import com.example.backend.Repository.ProjectMemberRepository;
 import com.example.backend.Repository.ProjectRepository;
 
-@Service 
+@Service
 public class ProjectService {
-        private UserRepository userRepository;
-        private ProjectRepository projectRepository;
 
-        public ProjectService(ProjectRepository projectRepository, UserRepository userRepository){
-            this.projectRepository = projectRepository;
-            this.userRepository = userRepository;
-        }
+    private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
+    private final ProjectMemberRepository projectMemberRepository;
 
-        public List<ProjectResponse> getAllProjects() {
-            return projectRepository.findAllWithMemberCount();
-        }
+    public ProjectService(ProjectRepository projectRepository, UserRepository userRepository, ProjectMemberRepository projectMemberRepository) {
+        this.projectRepository = projectRepository;
+        this.userRepository = userRepository;
+        this.projectMemberRepository = projectMemberRepository;
+    }
 
-    public void CreateProject(CreateProjectRequest CreateProjectRequest){
+    public List<ProjectResponse> getAllProjects() {
+        return projectRepository.findAllWithMemberCount();
+    }
+
+    public void CreateProject(CreateProjectRequest CreateProjectRequest) {
         Project project = new Project();
         project.setId(CreateProjectRequest.getId());
         project.setName(CreateProjectRequest.getName());
         project.setDescription(CreateProjectRequest.getDescription());
         project.setOwner(userRepository.findById(CreateProjectRequest.getOwner_id())
-        .orElseThrow(() -> new RuntimeException("Owner not found")));
+                .orElseThrow(() -> new RuntimeException("Owner not found")));
         project.setCreatedAt(LocalDateTime.now());
         projectRepository.save(project);
-}
+    }
 
-public void deleteProjectById(String id) {
+    public void deleteProjectById(String id) {
         projectRepository.deleteById(id);
     }
 
-}
+    public ProjectResponse getProjectById(String id) {
+        ProjectResponse project = projectRepository.findProjectById(id);
 
+        if (project == null) {
+            throw new AppException(HttpStatus.NOT_FOUND, "Project not found");
+        }
+
+        List<ProjectMember> members = projectMemberRepository.findByProjectId(id);
+        project.setMembers(members);
+
+        return project;
+
+    }
+
+}

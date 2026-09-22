@@ -9,11 +9,12 @@ import com.example.backend.DTO.Project.ProjectResponse;
 import com.example.backend.Entity.ProjectMember;
 
 public interface ProjectMemberRepository extends JpaRepository<ProjectMember, String> {
+
     List<ProjectMember> findByProjectId(String projectId);
 
     void deleteByProjectId(String projectId);
 
-      @Query("""
+    @Query("""
         SELECT new com.example.backend.DTO.Project.ProjectResponse(
             p.id,
             p.name,
@@ -33,8 +34,5 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, St
             p.createdAt
     """)
     List<ProjectResponse> findAllWithMemberCount();
-
-
-    
 
 }

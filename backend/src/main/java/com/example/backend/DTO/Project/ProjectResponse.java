@@ -2,14 +2,19 @@ package com.example.backend.DTO.Project;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
+
+import com.example.backend.Entity.ProjectMember;
 
 public class ProjectResponse {
+
     private String id;
     private String name;
     private String description;
     private String ownerName;
     private long memberCount;
     private LocalDateTime createdAt;
+    private List<ProjectMember> members;
 
     public ProjectResponse(String id, String name, String description, String ownerName, long memberCount, LocalDateTime createdAt) {
         this.id = id;
@@ -18,6 +23,17 @@ public class ProjectResponse {
         this.ownerName = ownerName;
         this.memberCount = memberCount;
         this.createdAt = createdAt;
+    }
+
+    public ProjectResponse() {
+    }
+
+    public List<ProjectMember> getMembers() {
+        return members;
+    }
+
+    public void setMembers(List<ProjectMember> members) {
+        this.members = members;
     }
 
     public String getId() {
@@ -67,6 +83,5 @@ public class ProjectResponse {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
-    
-    
+
 }

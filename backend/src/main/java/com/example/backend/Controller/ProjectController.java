@@ -1,6 +1,7 @@
 package com.example.backend.Controller;
 
 import com.example.backend.Service.ProjectMemberService;
+
 import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.backend.DTO.Project.CreateProjectRequest;
 import com.example.backend.DTO.Project.ProjectResponse;
 import com.example.backend.Entity.Project;
+import com.example.backend.Entity.ProjectMember;
 import com.example.backend.Service.ProjectService;
 
 @RestController 
@@ -41,10 +43,15 @@ public class ProjectController {
         }
      }
 
-      @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public String deleteProjectById(@PathVariable String id) {//@PathVariable lấy giá trị từ url
         projectService.deleteProjectById(id);
         return "Project deleted successfully";
     }
+
     
+    @GetMapping("/details/{id}")
+    public ProjectResponse getProjectMembersById(@PathVariable String id) {//@PathVariable lấy giá trị từ url
+        return projectService.getProjectById(id);
+    }
 }
