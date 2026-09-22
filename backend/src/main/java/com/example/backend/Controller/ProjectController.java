@@ -13,18 +13,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.DTO.Project.CreateProjectRequest;
+import com.example.backend.DTO.Project.InvitedProjectRequest;
 import com.example.backend.DTO.Project.ProjectResponse;
 import com.example.backend.Entity.Project;
 import com.example.backend.Entity.ProjectMember;
 import com.example.backend.Service.ProjectService;
 
-@RestController 
-@RequestMapping ("/api/projects")
+@RestController
+@RequestMapping("/api/projects")
 public class ProjectController {
-    private  ProjectMemberService projectMemberService;
-    private  ProjectService projectService;
 
-    public ProjectController(ProjectService projectService, ProjectMemberService projectMemberService){
+    private ProjectMemberService projectMemberService;
+    private ProjectService projectService;
+
+    public ProjectController(ProjectService projectService, ProjectMemberService projectMemberService) {
         this.projectService = projectService;
         this.projectMemberService = projectMemberService;
     }
@@ -33,15 +35,16 @@ public class ProjectController {
     public List<ProjectResponse> getAllProjects() {
         return projectService.getAllProjects();
     }
-     @PostMapping("/create")
-     public void CreateProject(@RequestBody CreateProjectRequest CreateProjectRequest){
+
+    @PostMapping("/create")
+    public void CreateProject(@RequestBody CreateProjectRequest CreateProjectRequest) {
         try {
             projectService.CreateProject(CreateProjectRequest);
             projectMemberService.AddMemberToProject(CreateProjectRequest);
-            } catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-     }
+    }
 
     @DeleteMapping("/delete/{id}")
     public String deleteProjectById(@PathVariable String id) {//@PathVariable lấy giá trị từ url
@@ -49,9 +52,17 @@ public class ProjectController {
         return "Project deleted successfully";
     }
 
-    
     @GetMapping("/details/{id}")
     public ProjectResponse getProjectMembersById(@PathVariable String id) {//@PathVariable lấy giá trị từ url
         return projectService.getProjectById(id);
+    }
+
+    @PostMapping("/invite")
+    public void InviteMemberToProject(@RequestBody InvitedProjectRequest invitedProjectRequest) {
+        try {
+            projectMemberService.InviteMemberToProject(invitedProjectRequest.getProjectId(), invitedProjectRequest.getEmail());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

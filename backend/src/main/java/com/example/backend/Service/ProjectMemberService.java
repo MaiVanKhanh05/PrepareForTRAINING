@@ -35,6 +35,7 @@ public class ProjectMemberService {
         return projectMemberRepository.findByProjectId(projectId);
     }
 
+    //Create new project
     public void AddMemberToProject(CreateProjectRequest CreateProjectRequest) {
         for (String email : CreateProjectRequest.getEmail()) {
 
@@ -52,7 +53,24 @@ public class ProjectMemberService {
             projectMember.setJoinedAt(new Date());
             projectMemberRepository.save(projectMember);
         }
+    }
 
+    //Invite new member to existing project
+    public void InviteMemberToProject(String projectId, String email) {
+
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isEmpty()) {
+            throw new AppException(HttpStatus.CONFLICT,
+                    "Email " + email + " không tồn tại");
+        }
+
+        ProjectMember projectMember = new ProjectMember();
+        projectMember.setId(java.util.UUID.randomUUID().toString());
+        projectMember.setProjectId(projectId);
+        projectMember.setMemberId(user.get().getId());
+        projectMember.setJoinedAt(new Date());
+        projectMemberRepository.save(projectMember);
     }
 
 }
