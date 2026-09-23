@@ -16,6 +16,16 @@ public class ProjectResponse {
     private LocalDateTime createdAt;
     private List<ProjectMember> members;
 
+    public ProjectResponse(String id, String name, String description, String ownerName, long memberCount, LocalDateTime createdAt, List<ProjectMember> members) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.ownerName = ownerName;
+        this.memberCount = memberCount;
+        this.createdAt = createdAt;
+        this.members = members;
+    }
+
     public ProjectResponse(String id, String name, String description, String ownerName, long memberCount, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;

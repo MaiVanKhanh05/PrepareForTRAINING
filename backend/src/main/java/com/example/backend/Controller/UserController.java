@@ -36,4 +36,8 @@ public class UserController {
         return "User deleted successfully";
     }
     
+    @GetMapping("/check-email")
+    public boolean checkEmailExists(@RequestParam String email) {
+        return userService.checkEmailExists(email);
+    }
 }

@@ -51,7 +51,7 @@ const Projects = () => {
     return new Date(date).toLocaleDateString('vi-VN');
   };
 
-  const handleEmailKeyDown = (e) => {
+  const handleEmailKeyDown = async (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
 
@@ -66,8 +66,23 @@ const Projects = () => {
         return;
       }
 
-      setEmails([...emails, email]);
-      setEmailInput("");
+      try {
+        const response = await axios.get(`http://localhost:8080/api/users/check-email?email=${email}`, {
+          headers: {
+            Authorization: 'Bearer ' + token
+          }
+        });
+        
+        if (response.data === true) {
+          setEmails([...emails, email]);
+          setEmailInput("");
+        } else {
+          alert("Email " + email + " không tồn tại!");
+        }
+      } catch (error) {
+        console.error("Lỗi khi kiểm tra email:", error);
+        alert("Có lỗi xảy ra khi kiểm tra email!");
+      }
     }
   };
 

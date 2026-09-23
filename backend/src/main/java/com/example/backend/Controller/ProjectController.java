@@ -18,6 +18,9 @@ import com.example.backend.DTO.Project.ProjectResponse;
 import com.example.backend.Entity.Project;
 import com.example.backend.Entity.ProjectMember;
 import com.example.backend.Service.ProjectService;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @RestController
 @RequestMapping("/api/projects")
@@ -37,13 +40,10 @@ public class ProjectController {
     }
 
     @PostMapping("/create")
+    @Transactional
     public void CreateProject(@RequestBody CreateProjectRequest CreateProjectRequest) {
-        try {
-            projectService.CreateProject(CreateProjectRequest);
-            projectMemberService.AddMemberToProject(CreateProjectRequest);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        projectService.CreateProject(CreateProjectRequest);
+        projectMemberService.AddMemberToProject(CreateProjectRequest);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -52,17 +52,20 @@ public class ProjectController {
         return "Project deleted successfully";
     }
 
-    @GetMapping("/details/{id}")
-    public ProjectResponse getProjectMembersById(@PathVariable String id) {//@PathVariable lấy giá trị từ url
-        return projectService.getProjectById(id);
-    }
 
     @PostMapping("/invite")
     public void InviteMemberToProject(@RequestBody InvitedProjectRequest invitedProjectRequest) {
-        try {
-            projectMemberService.InviteMemberToProject(invitedProjectRequest.getProjectId(), invitedProjectRequest.getEmail());
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        projectMemberService.InviteMemberToProject(invitedProjectRequest.getProjectId(), invitedProjectRequest.getEmail());
     }
+
+    @GetMapping("/{userId}")
+    public List<ProjectResponse> getMyProjects(@PathVariable String userId) {
+        return projectService.getMyProjects(userId);
+    }
+
+    @GetMapping("/detail/{projectId}")
+    public ProjectResponse getProjectById(@PathVariable String projectId) {
+        return projectService.getProjectById(projectId);
+    }
+    
 }

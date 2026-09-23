@@ -22,4 +22,8 @@ public class UserService {
     public void deleteUserById(String id) {
         userRepository.deleteById(id);
     }
+
+    public boolean checkEmailExists(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
 }

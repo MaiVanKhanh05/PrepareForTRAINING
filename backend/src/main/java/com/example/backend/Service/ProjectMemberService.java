@@ -50,6 +50,7 @@ public class ProjectMemberService {
             projectMember.setId(java.util.UUID.randomUUID().toString());
             projectMember.setProjectId(CreateProjectRequest.getId());
             projectMember.setMemberId(user.get().getId());
+            projectMember.setMemberName(user.get().getFull_name());
             projectMember.setJoinedAt(new Date());
             projectMemberRepository.save(projectMember);
         }
@@ -69,6 +70,7 @@ public class ProjectMemberService {
         projectMember.setId(java.util.UUID.randomUUID().toString());
         projectMember.setProjectId(projectId);
         projectMember.setMemberId(user.get().getId());
+        projectMember.setMemberName(user.get().getFull_name());
         projectMember.setJoinedAt(new Date());
         projectMemberRepository.save(projectMember);
     }

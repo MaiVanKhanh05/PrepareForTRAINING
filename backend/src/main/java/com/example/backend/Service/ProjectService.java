@@ -63,4 +63,22 @@ public class ProjectService {
 
     }
 
+    public List<ProjectResponse> getMyProjects(String userid) {
+        return projectMemberRepository.findByMemberId(userid);
+    }
+
+    public ProjectResponse InsertMemberToProjectById(String id) {
+        ProjectResponse project = projectRepository.findProjectById(id);
+
+        if (project == null) {
+            throw new AppException(HttpStatus.NOT_FOUND, "Project not found");
+        }
+
+        List<ProjectMember> members = projectMemberRepository.findByProjectId(project.getId());
+        project.setMembers(members);
+
+        return project;
+    }
+
+
 }

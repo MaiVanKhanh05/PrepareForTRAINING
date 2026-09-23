@@ -22,6 +22,10 @@ public class ProjectMember {
     @Column(name = "joined_at")
     private Date joinedAt;
 
+    @Column(name = "member_name")
+    @com.fasterxml.jackson.annotation.JsonProperty("Name")
+    private String memberName;
+
     public ProjectMember() {
     }
 
@@ -62,5 +66,13 @@ public class ProjectMember {
 
     public void setJoinedAt(Date joinedAt) {
         this.joinedAt = joinedAt;
+    }
+
+    public String getMemberName() {
+        return memberName;
+    }
+
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
     }
 }
