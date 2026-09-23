@@ -18,6 +18,46 @@ const ProjectDetail = () => {
   const [invitedEmails, setInvitedEmails] = useState([]);
   const token = localStorage.getItem("token");
 
+  const [tasks, setTasks] = useState([]);
+
+  const [taskTitle, setTaskTitle] = useState("");
+  const [taskDescription, setTaskDescription] = useState("");
+  const [taskStatus, setTaskStatus] = useState("TODO");
+  const [taskAssignee, setTaskAssignee] = useState("");
+  const [taskDueDate, setTaskDueDate] = useState("");
+
+  const handleCreateTask = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:8080/api/tasks/create',
+        {
+          projectId: id,
+          title: taskTitle,
+          description: taskDescription,
+          status: taskStatus,
+          assignedTo: taskAssignee,
+          dueDate: taskDueDate ? new Date(taskDueDate).toISOString() : null
+        },
+        {
+          headers: {
+            Authorization: 'Bearer ' + token
+          }
+        }
+      );
+      setShowNewTaskModal(false);
+      setTaskTitle("");
+      setTaskDescription("");
+      setTaskStatus("TODO");
+      setTaskAssignee("");
+      setTaskDueDate("");
+      getTasksByProjectId(id);
+      alert("Task created successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to create task");
+    }
+  };
+
   const handleInvite = async (e) => {
     e.preventDefault();
 
@@ -64,21 +104,38 @@ const ProjectDetail = () => {
 
   const getProjectById = async (id) => {
     try {
-      const response = await axios.get('http://localhost:8080/api/projects/details/' + id,
+      const response = await axios.get('http://localhost:8080/api/projects/detail/' + id,
         {
           headers: {
             Authorization: 'Bearer ' + token
           }
         }
       );
-      console.log(response.data);
+      console.log("projectDetail: ", response.data);
       setProject(response.data);
     } catch (error) {
       console.log(error);
     }
   };
+
+  const getTasksByProjectId = async (id) => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/tasks/project/' + id,
+        {
+          headers: {
+            Authorization: 'Bearer ' + token
+          }
+        }
+      );
+      setTasks(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     getProjectById(id);
+    getTasksByProjectId(id);
   }, [id]);
 
   if (!project) {
@@ -88,6 +145,9 @@ const ProjectDetail = () => {
       </div>
     );
   }
+
+  console.log("task: ", tasks);
+
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -139,14 +199,16 @@ const ProjectDetail = () => {
               <div className="p-2 bg-zinc-100 rounded-lg"><Calendar className="h-4 w-4" /></div>
               <div>
                 <p className="text-xs text-zinc-400 font-medium">Due Date</p>
-                <p className="text-sm font-semibold">Oct 24, 2026</p>
+                <p className="text-sm font-semibold">N/A</p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-zinc-600">
               <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><CheckCircle2 className="h-4 w-4" /></div>
               <div>
                 <p className="text-xs text-zinc-400 font-medium">Progress</p>
-                <p className="text-sm font-semibold text-indigo-700">65% Completed</p>
+                <p className="text-sm font-semibold text-indigo-700">
+                  {tasks.length > 0 ? Math.round((tasks.filter(t => t.status === 'DONE').length / tasks.length) * 100) : 0}% Completed
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-zinc-600">
@@ -196,7 +258,8 @@ const ProjectDetail = () => {
       </div>
 
       {/* Content Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {activeTab === 'overview' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* Main Content (2/3 width) */}
         <div className="lg:col-span-2 space-y-6">
@@ -210,25 +273,27 @@ const ProjectDetail = () => {
             <div className="flex gap-4 mb-6">
               <div className="flex-1 bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
                 <p className="text-zinc-500 text-sm font-medium mb-1">To Do</p>
-                <p className="text-2xl font-bold text-zinc-900">12</p>
+                <p className="text-2xl font-bold text-zinc-900">{tasks.filter(t => t.status === 'TODO').length}</p>
               </div>
               <div className="flex-1 bg-blue-50 rounded-2xl p-4 border border-blue-100">
                 <p className="text-blue-600 text-sm font-medium mb-1">In Progress</p>
-                <p className="text-2xl font-bold text-blue-700">5</p>
+                <p className="text-2xl font-bold text-blue-700">{tasks.filter(t => t.status === 'IN_PROGRESS').length}</p>
               </div>
               <div className="flex-1 bg-emerald-50 rounded-2xl p-4 border border-emerald-100">
                 <p className="text-emerald-600 text-sm font-medium mb-1">Completed</p>
-                <p className="text-2xl font-bold text-emerald-700">24</p>
+                <p className="text-2xl font-bold text-emerald-700">{tasks.filter(t => t.status === 'DONE').length}</p>
               </div>
             </div>
 
             <div>
               <div className="flex justify-between text-sm mb-2">
                 <span className="font-medium text-zinc-700">Overall Completion</span>
-                <span className="font-bold text-indigo-600">65%</span>
+                <span className="font-bold text-indigo-600">
+                  {tasks.length > 0 ? Math.round((tasks.filter(t => t.status === 'DONE').length / tasks.length) * 100) : 0}%
+                </span>
               </div>
               <div className="w-full bg-zinc-100 rounded-full h-3 overflow-hidden">
-                <div className="bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out" style={{ width: '65%' }}></div>
+                <div className="bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out" style={{ width: `${tasks.length > 0 ? Math.round((tasks.filter(t => t.status === 'DONE').length / tasks.length) * 100) : 0}%` }}></div>
               </div>
             </div>
           </div>
@@ -240,26 +305,38 @@ const ProjectDetail = () => {
               <button className="text-sm font-medium text-indigo-600 hover:text-indigo-700">View All</button>
             </div>
             <div className="space-y-3">
-              {[
-                { title: 'Design system updates', status: 'In Progress', color: 'blue' },
-                { title: 'API integration for payments', status: 'To Do', color: 'zinc' },
-                { title: 'Homepage responsive layout', status: 'Completed', color: 'emerald' }
-              ].map((task, idx) => (
-                <div key={idx} className="flex items-center justify-between p-4 rounded-2xl border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all bg-zinc-50/50 hover:bg-white group cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-xl bg-${task.color}-100 text-${task.color}-600`}>
-                      <CheckCircle2 className="h-5 w-5" />
+              {tasks.length === 0 ? (
+                <p className="text-zinc-500 text-sm">No tasks found. Create one above.</p>
+              ) : (
+                tasks.slice(0, 5).map((task) => {
+                  let color = 'zinc';
+                  let displayStatus = 'To Do';
+                  if (task.status === 'IN_PROGRESS') {
+                    color = 'blue';
+                    displayStatus = 'In Progress';
+                  } else if (task.status === 'DONE') {
+                    color = 'emerald';
+                    displayStatus = 'Completed';
+                  }
+
+                  return (
+                    <div key={task.id} className="flex items-center justify-between p-4 rounded-2xl border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all bg-zinc-50/50 hover:bg-white group cursor-pointer">
+                      <div className="flex items-center gap-4">
+                        <div className={`p-2 rounded-xl bg-${color}-100 text-${color}-600`}>
+                          <CheckCircle2 className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors">{task.title}</p>
+                          <p className="text-xs text-zinc-500 mt-0.5">Created on {new Date(task.createdAt).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-${color}-100 text-${color}-700 border border-${color}-200`}>
+                        {displayStatus}
+                      </span>
                     </div>
-                    <div>
-                      <p className="font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors">{task.title}</p>
-                      <p className="text-xs text-zinc-500 mt-0.5">Updated 2 hours ago</p>
-                    </div>
-                  </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-${task.color}-100 text-${task.color}-700 border border-${task.color}-200`}>
-                    {task.status}
-                  </span>
-                </div>
-              ))}
+                  );
+                })
+              )}
             </div>
           </div>
         </div>
@@ -298,7 +375,108 @@ const ProjectDetail = () => {
             </button>
           </div>
         </div>
-      </div>
+        </div>
+      )}
+
+      {/* Tasks Tab */}
+      {activeTab === 'tasks' && (
+        <div className="bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-zinc-900">All Tasks</h2>
+            <button
+              onClick={() => setShowNewTaskModal(true)}
+              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl font-medium transition-all shadow-md shadow-indigo-200"
+            >
+              <Plus className="h-4 w-4" />
+              New Task
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tasks.length === 0 ? (
+              <p className="text-zinc-500 text-sm col-span-3 text-center py-10">No tasks found. Create one above.</p>
+            ) : (
+              tasks.map((task) => {
+                let color = 'zinc';
+                let displayStatus = 'To Do';
+                if (task.status === 'IN_PROGRESS') {
+                  color = 'blue';
+                  displayStatus = 'In Progress';
+                } else if (task.status === 'DONE') {
+                  color = 'emerald';
+                  displayStatus = 'Completed';
+                }
+
+                const assignee = project.members?.find(m => m.memberId === task.assignedTo || m.id === task.assignedTo);
+
+                return (
+                  <div key={task.id} className="p-5 rounded-2xl border border-zinc-200 hover:border-indigo-300 hover:shadow-md transition-all bg-white group flex flex-col h-full">
+                    <div className="flex items-start justify-between mb-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-${color}-100 text-${color}-700 border border-${color}-200`}>
+                        {displayStatus}
+                      </span>
+                      <button className="text-zinc-400 hover:text-zinc-600">
+                        <MoreVertical className="h-5 w-5" />
+                      </button>
+                    </div>
+                    <h3 className="font-bold text-lg text-zinc-900 mb-2 group-hover:text-indigo-600 transition-colors line-clamp-2">{task.title}</h3>
+                    <p className="text-sm text-zinc-500 mb-4 line-clamp-3 flex-grow">{task.description}</p>
+                    
+                    <div className="mt-auto pt-4 border-t border-zinc-100 flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs font-medium text-zinc-500">
+                        <Calendar className="h-4 w-4 text-zinc-400" />
+                        {task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}
+                      </div>
+                      {assignee && (
+                        <div className="flex items-center gap-2" title={`Assigned to ${assignee.Name}`}>
+                          <img src={`https://i.pravatar.cc/100?u=${assignee.memberId || assignee.id}`} alt="Assignee" className="w-6 h-6 rounded-full border border-zinc-200" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Members Tab */}
+      {activeTab === 'members' && (
+        <div className="bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-zinc-900">Project Members ({project.members?.length || 0})</h2>
+            <button
+              onClick={() => setShowInviteModal(true)}
+              className="flex items-center gap-2 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 px-5 py-2 rounded-xl font-medium transition-all shadow-sm"
+            >
+              <Users className="h-4 w-4" />
+              Invite Member
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {project.members && project.members.map((member) => (
+              <div key={member.id} className="flex items-center gap-4 p-4 rounded-2xl border border-zinc-100 bg-zinc-50/50 hover:bg-white hover:border-zinc-200 transition-all">
+                <img
+                  src={member.avatar || `https://i.pravatar.cc/100?u=${member.memberId || member.id}`}
+                  alt={member.Name || "Member"}
+                  className="w-12 h-12 rounded-full border-2 border-white shadow-sm"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-zinc-900 truncate" title={`Name: ${member.Name}`}>
+                    {member.Name}
+                  </p>
+                  <p className="text-xs text-zinc-500 truncate mt-0.5">Joined: {new Date(member.joinedAt).toLocaleDateString()}</p>
+                </div>
+                <button className="text-zinc-400 hover:text-zinc-600 p-2">
+                  <MoreVertical className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* New Task Modal */}
       {showNewTaskModal && (
@@ -314,11 +492,13 @@ const ProjectDetail = () => {
               </button>
             </div>
 
-            <form className="p-6 space-y-5" onSubmit={(e) => { e.preventDefault(); setShowNewTaskModal(false); }}>
+            <form className="p-6 space-y-5" onSubmit={handleCreateTask}>
               <div>
                 <label className="block text-sm font-semibold text-zinc-700 mb-1.5">Task Title</label>
                 <input
                   type="text"
+                  value={taskTitle}
+                  onChange={(e) => setTaskTitle(e.target.value)}
                   placeholder="e.g., Update landing page copy"
                   className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
                   required
@@ -329,6 +509,8 @@ const ProjectDetail = () => {
                 <label className="block text-sm font-semibold text-zinc-700 mb-1.5">Description</label>
                 <textarea
                   rows="3"
+                  value={taskDescription}
+                  onChange={(e) => setTaskDescription(e.target.value)}
                   placeholder="Add details about this task..."
                   className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all resize-none"
                 ></textarea>
@@ -337,41 +519,41 @@ const ProjectDetail = () => {
               <div className="grid grid-cols-2 gap-5">
                 <div>
                   <label className="block text-sm font-semibold text-zinc-700 mb-1.5">Status</label>
-                  <select className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all bg-white">
-                    <option value="todo">To Do</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="completed">Completed</option>
+                  <select
+                    value={taskStatus}
+                    onChange={(e) => setTaskStatus(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all bg-white"
+                  >
+                    <option value="TODO">To Do</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="DONE">Done</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-zinc-700 mb-1.5">Priority</label>
-                  <select className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all bg-white">
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-5">
                 <div>
                   <label className="block text-sm font-semibold text-zinc-700 mb-1.5">Assignee</label>
-                  <select className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all bg-white">
+                  <select
+                    value={taskAssignee}
+                    onChange={(e) => setTaskAssignee(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all bg-white"
+                  >
                     <option value="">Unassigned</option>
                     {project.members && project.members.map(member => (
                       <option key={member.id} value={member.memberId || member.id}>
-                        {member.name || member.memberId || `Member ${member.id}`}
+                        {member.Name}
                       </option>
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-zinc-700 mb-1.5">Due Date</label>
-                  <input
-                    type="date"
-                    className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
-                  />
-                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-zinc-700 mb-1.5">Due Date</label>
+                <input
+                  type="date"
+                  value={taskDueDate}
+                  onChange={(e) => setTaskDueDate(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-zinc-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
+                />
               </div>
 
               <div className="pt-4 flex gap-3 justify-end">
