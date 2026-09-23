@@ -72,7 +72,7 @@ const Projects = () => {
             Authorization: 'Bearer ' + token
           }
         });
-        
+
         if (response.data === true) {
           setEmails([...emails, email]);
           setEmailInput("");
@@ -88,10 +88,10 @@ const Projects = () => {
 
   const handleCreate = async (e) => {
     const generateProjectId = () => {
-  return Date.now().toString();
-};
+      return Date.now().toString();
+    };
     console.log({
-      id:generateProjectId(),
+      id: generateProjectId(),
       name,
       description,
       emails,
@@ -102,7 +102,7 @@ const Projects = () => {
     try {
       const response = await axios.post('http://localhost:8080/api/projects/create',
         {
-          id:generateProjectId(),
+          id: generateProjectId(),
           name,
           description,
           email: emails,
@@ -179,9 +179,9 @@ const Projects = () => {
                 <Folder className="h-6 w-6" />
               </div>
               <div className="relative">
-                <button 
+                <button
                   onClick={(e) => {
-                    e.stopPropagation(); 
+                    e.stopPropagation();
                     setOpenDropdownId(openDropdownId === project.id ? null : project.id);
                   }}
                   className="text-zinc-400 hover:text-zinc-600 p-1 rounded-lg hover:bg-zinc-100 transition-colors"
@@ -190,7 +190,7 @@ const Projects = () => {
                 </button>
                 {openDropdownId === project.id && (
                   <div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-lg border border-zinc-100 py-1 z-10 animate-in fade-in zoom-in-95 duration-100">
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         // handle Edit
@@ -200,10 +200,10 @@ const Projects = () => {
                     >
                       <Edit2 className="h-4 w-4" /> Edit
                     </button>
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        if(window.confirm('Are you sure you want to delete this project?')) {
+                        if (window.confirm('Are you sure you want to delete this project?')) {
                           handleDelete(project.id);
                         }
                         setOpenDropdownId(null);
@@ -256,6 +256,9 @@ const Projects = () => {
                   required
                   value={description} onChange={(e) => setDescription(e.target.value)}></textarea>
               </div>
+
+
+              {/*
               <div>
                 <label className="block text-sm font-medium text-zinc-700 mb-1">Invite Members (Email)</label>
                 <input
@@ -269,7 +272,7 @@ const Projects = () => {
                   onKeyDown={handleEmailKeyDown}
                 />
 
-                {/* hiện thị email đã nhập */}
+                
                 <div className="mt-2 flex gap-2 flex-wrap">
                   {emails.map((email, index) => (
                     <div key={index} className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg">
@@ -283,6 +286,9 @@ const Projects = () => {
                 </div>
                 <p className="text-xs text-zinc-500 mt-1">Separate multiple emails with commas</p>
               </div>
+              
+              */}
+
             </div>
             <div className="p-4 bg-zinc-50 border-t border-zinc-100 flex justify-end gap-3">
               <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-zinc-600 font-medium hover:bg-zinc-200/50 rounded-lg transition-colors">Cancel</button>

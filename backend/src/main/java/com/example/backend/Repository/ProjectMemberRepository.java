@@ -60,4 +60,6 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, St
             p.createdAt
     """)
     List<ProjectResponse> findByMemberId(@Param("userId") String userId);
+
+    List<ProjectMember> findByProjectIdAndMemberId(String projectId, String memberId);
 }

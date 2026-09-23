@@ -37,22 +37,10 @@ public class ProjectMemberService {
 
     //Create new project
     public void AddMemberToProject(CreateProjectRequest CreateProjectRequest) {
-        for (String email : CreateProjectRequest.getEmail()) {
-
-            Optional<User> user = userRepository.findByEmail(email);
-
-            if (user.isEmpty()) {
-                throw new AppException(HttpStatus.CONFLICT,
-                        "Email " + email + " không tồn tại");
+        if (CreateProjectRequest.getEmail() != null) {
+            for (String email : CreateProjectRequest.getEmail()) {
+                InviteMemberToProject(CreateProjectRequest.getId(), email);
             }
-
-            ProjectMember projectMember = new ProjectMember();
-            projectMember.setId(java.util.UUID.randomUUID().toString());
-            projectMember.setProjectId(CreateProjectRequest.getId());
-            projectMember.setMemberId(user.get().getId());
-            projectMember.setMemberName(user.get().getFull_name());
-            projectMember.setJoinedAt(new Date());
-            projectMemberRepository.save(projectMember);
         }
     }
 
@@ -64,6 +52,16 @@ public class ProjectMemberService {
         if (user.isEmpty()) {
             throw new AppException(HttpStatus.CONFLICT,
                     "Email " + email + " không tồn tại");
+        }
+
+        List<ProjectMember> email_inProjectMembers = projectMemberRepository.findByProjectIdAndMemberId(projectId, user.get().getId());
+        if (!email_inProjectMembers.isEmpty()) {
+            throw new AppException(HttpStatus.CONFLICT,
+                    "User " + email + " đã là thành viên của dự án");
+        }
+        if (!user.get().getRole().equals("USER")) {
+            throw new AppException(HttpStatus.FORBIDDEN,
+                    "Email " + email + " không có quyền");
         }
 
         ProjectMember projectMember = new ProjectMember();
