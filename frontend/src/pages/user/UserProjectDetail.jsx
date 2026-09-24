@@ -174,21 +174,21 @@ function UserProjectDetail() {
                         {/* Progress Overview */}
                         <div className="bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm">
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-bold text-zinc-900">My Task Progress</h2>
+                                <h2 className="text-lg font-bold text-zinc-900">Project Task Progress</h2>
                             </div>
 
                             <div className="flex gap-4 mb-6">
                                 <div className="flex-1 bg-zinc-50 rounded-2xl p-4 border border-zinc-100">
                                     <p className="text-zinc-500 text-sm font-medium mb-1">To Do</p>
-                                    <p className="text-2xl font-bold text-zinc-900">{myTasks.filter(t => t.status === 'TODO').length}</p>
+                                    <p className="text-2xl font-bold text-zinc-900">{tasks.filter(t => t.status === 'TODO').length}</p>
                                 </div>
                                 <div className="flex-1 bg-blue-50 rounded-2xl p-4 border border-blue-100">
                                     <p className="text-blue-600 text-sm font-medium mb-1">In Progress</p>
-                                    <p className="text-2xl font-bold text-blue-700">{myTasks.filter(t => t.status === 'IN_PROGRESS').length}</p>
+                                    <p className="text-2xl font-bold text-blue-700">{tasks.filter(t => t.status === 'IN_PROGRESS').length}</p>
                                 </div>
                                 <div className="flex-1 bg-emerald-50 rounded-2xl p-4 border border-emerald-100">
                                     <p className="text-emerald-600 text-sm font-medium mb-1">Completed</p>
-                                    <p className="text-2xl font-bold text-emerald-700">{myTasks.filter(t => t.status === 'DONE').length}</p>
+                                    <p className="text-2xl font-bold text-emerald-700">{tasks.filter(t => t.status === 'DONE').length}</p>
                                 </div>
                             </div>
 
@@ -196,25 +196,25 @@ function UserProjectDetail() {
                                 <div className="flex justify-between text-sm mb-2">
                                     <span className="font-medium text-zinc-700">Overall Completion</span>
                                     <span className="font-bold text-indigo-600">
-                                        {myTasks.length > 0 ? Math.round((myTasks.filter(t => t.status === 'DONE').length / myTasks.length) * 100) : 0}%
+                                        {tasks.length > 0 ? Math.round((tasks.filter(t => t.status === 'DONE').length / tasks.length) * 100) : 0}%
                                     </span>
                                 </div>
                                 <div className="w-full bg-zinc-100 rounded-full h-3 overflow-hidden">
-                                    <div className="bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out" style={{ width: `${myTasks.length > 0 ? Math.round((myTasks.filter(t => t.status === 'DONE').length / myTasks.length) * 100) : 0}%` }}></div>
+                                    <div className="bg-indigo-600 h-3 rounded-full transition-all duration-1000 ease-out" style={{ width: `${tasks.length > 0 ? Math.round((tasks.filter(t => t.status === 'DONE').length / tasks.length) * 100) : 0}%` }}></div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Recent Tasks */}
+                        {/* All Project Tasks */}
                         <div className="bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm">
                             <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-bold text-zinc-900">My Recent Tasks</h2>
+                                <h2 className="text-lg font-bold text-zinc-900">All Project Tasks</h2>
                             </div>
-                            <div className="space-y-3">
-                                {myTasks.length === 0 ? (
-                                    <p className="text-zinc-500 text-sm">You don't have any tasks assigned yet.</p>
+                            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                                {tasks.length === 0 ? (
+                                    <p className="text-zinc-500 text-sm">There are no tasks in this project yet.</p>
                                 ) : (
-                                    myTasks.slice(0, 5).map((task) => {
+                                    tasks.map((task) => {
                                         let color = 'zinc';
                                         let displayStatus = 'To Do';
                                         if (task.status === 'IN_PROGRESS') {
@@ -226,7 +226,7 @@ function UserProjectDetail() {
                                         }
 
                                         return (
-                                            <div key={task.id} onClick={() => setActiveTab('tasks')} className="flex items-center justify-between p-4 rounded-2xl border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all bg-zinc-50/50 hover:bg-white group cursor-pointer">
+                                            <div key={task.id} onClick={() => navigate(`/home/projects/${id}/tasks/${task.id}`)} className="flex items-center justify-between p-4 rounded-2xl border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all bg-zinc-50/50 hover:bg-white group cursor-pointer">
                                                 <div className="flex items-center gap-4">
                                                     <div className={`p-2 rounded-xl bg-${color}-100 text-${color}-600`}>
                                                         <CheckCircle2 className="h-5 w-5" />
@@ -301,7 +301,7 @@ function UserProjectDetail() {
                                 }
 
                                 return (
-                                    <div key={task.id} className="p-5 rounded-2xl border border-zinc-200 hover:border-indigo-300 hover:shadow-md transition-all bg-white group flex flex-col h-full">
+                                    <div key={task.id} onClick={() => navigate(`/home/projects/${id}/tasks/${task.id}`)} className="p-5 rounded-2xl border border-zinc-200 hover:border-indigo-300 hover:shadow-md transition-all bg-white group flex flex-col h-full cursor-pointer">
                                         <div className="flex items-start justify-between mb-4">
                                             <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-${color}-100 text-${color}-700 border border-${color}-200`}>
                                                 {displayStatus}
@@ -343,32 +343,32 @@ function UserProjectDetail() {
                         {project.members && project.members.map((member) => {
                             const isOwner = member.Name === project.ownerName;
                             return (
-                            <div key={member.id} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${
-                                isOwner ? 'border-red-300 bg-red-50/30 shadow-sm' : 'border-zinc-100 bg-zinc-50/50 hover:bg-white hover:border-zinc-200'
-                            }`}>
-                                <div className="relative">
-                                    <img
-                                        src={member.avatar || `https://i.pravatar.cc/100?u=${member.memberId || member.id}`}
-                                        alt={member.Name || "Member"}
-                                        className={`w-12 h-12 rounded-full border-2 shadow-sm ${isOwner ? 'border-red-500' : 'border-white'}`}
-                                    />
-                                    {isOwner && (
-                                        <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
-                                            ★
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <div className="flex items-center gap-2">
-                                        <p className={`font-semibold truncate ${isOwner ? 'text-red-700' : 'text-zinc-900'}`} title={`Name: ${member.Name}`}>
-                                            {member.Name}
-                                        </p>
-                                        {isOwner && <span className="px-2 py-0.5 rounded-md bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider">Owner</span>}
+                                <div key={member.id} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${isOwner ? 'border-red-300 bg-red-50/30 shadow-sm' : 'border-zinc-100 bg-zinc-50/50 hover:bg-white hover:border-zinc-200'
+                                    }`}>
+                                    <div className="relative">
+                                        <img
+                                            src={member.avatar || `https://i.pravatar.cc/100?u=${member.memberId || member.id}`}
+                                            alt={member.Name || "Member"}
+                                            className={`w-12 h-12 rounded-full border-2 shadow-sm ${isOwner ? 'border-red-500' : 'border-white'}`}
+                                        />
+                                        {isOwner && (
+                                            <div className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm">
+                                                ★
+                                            </div>
+                                        )}
                                     </div>
-                                    <p className="text-xs text-zinc-500 truncate mt-0.5">Joined: {new Date(member.joinedAt).toLocaleDateString()}</p>
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <p className={`font-semibold truncate ${isOwner ? 'text-red-700' : 'text-zinc-900'}`} title={`Name: ${member.Name}`}>
+                                                {member.Name}
+                                            </p>
+                                            {isOwner && <span className="px-2 py-0.5 rounded-md bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wider">Owner</span>}
+                                        </div>
+                                        <p className="text-xs text-zinc-500 truncate mt-0.5">Joined: {new Date(member.joinedAt).toLocaleDateString()}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        )})}
+                            )
+                        })}
                     </div>
                 </div>
             )}

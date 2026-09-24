@@ -13,6 +13,7 @@ import Team from './pages/owner/Team';
 
 import UserProjects from './pages/user/Projects';
 import UserProjectDetail from './pages/user/UserProjectDetail';
+import UserTaskDetail from './pages/user/UserTaskDetail';
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
 
         <Route path="/home/" element={<Home />}>
           <Route path="projects/:id" element={<UserProjectDetail />} />
+          <Route path="projects/:projectId/tasks/:taskId" element={<UserTaskDetail />} />
         </Route>
 
 
