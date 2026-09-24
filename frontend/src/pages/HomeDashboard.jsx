@@ -201,7 +201,9 @@ const HomeDashboard = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {myProjects.map(project => (
-            <div key={project.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:border-indigo-300 hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col h-full">
+            <div key={project.id}
+              onClick={() => navigate('/home/projects/' + project.id)}
+              className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:border-indigo-300 hover:shadow-md transition-all duration-200 cursor-pointer group flex flex-col h-full">
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center space-x-3.5">
                   <div className="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600 group-hover:border-indigo-100 transition-colors">
@@ -253,7 +255,7 @@ const HomeDashboard = () => {
           <ul className="divide-y divide-slate-100">
             {mockDocuments.map(doc => (
               <li key={doc.id} className="p-4 sm:px-6 hover:bg-slate-50/80 transition-colors flex items-center justify-between group cursor-pointer">
-                <div className="flex items-center min-w-0 flex-1">
+                <div className="flex items-center min-w-0 flex-1" >
                   <div className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg bg-slate-50">
                     {getFileIcon(doc.type)}
                   </div>

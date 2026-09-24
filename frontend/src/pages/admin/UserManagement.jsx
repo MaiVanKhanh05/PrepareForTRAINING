@@ -1,30 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import { Edit2, Eye, EyeDashed, Pointer, Trash2 } from 'lucide-react';
+import { Edit2, Eye, EyeDashed, Pointer, Trash2, Search } from 'lucide-react';
 import axios from 'axios';
 
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [searchEmail, setSearchEmail] = useState('');
+  const pageSize = 5;
   const token = localStorage.getItem("token");
 
-  const getAllUser = async () => {
+  const getAllUser = async (page = 0, email = searchEmail) => {
     try {
-      const response = await axios.get('http://localhost:8080/api/users',
+      const response = await axios.get(`http://localhost:8080/api/users?page=${page}&size=${pageSize}&email=${encodeURIComponent(email)}`,
         {
           headers: {
             Authorization: 'Bearer ' + token
           }
         }
       );
-      console.log(response);
-      setUsers(response.data);
+      setUsers(response.data.content);
+      setTotalPages(response.data.totalPages);
+      setCurrentPage(page);
     } catch (error) {
       console.log(error);
     }
   };
 
+  // Re-fetch when searchEmail changes (reset to page 0)
   useEffect(() => {
-    getAllUser();
+    const delayDebounceFn = setTimeout(() => {
+      getAllUser(0, searchEmail);
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchEmail]);
+
+  // Initial fetch
+  useEffect(() => {
+    getAllUser(0);
   }, [])
 
   const handleEdit = (id) => {
@@ -42,7 +57,7 @@ const UserManagement = () => {
 
       );
 
-      await getAllUser();
+      await getAllUser(currentPage);
 
     } catch (error) {
       console.log(error);
@@ -57,6 +72,18 @@ const UserManagement = () => {
         <div>
           <h1 className="text-2xl font-bold text-zinc-900">User Management</h1>
           <p className="text-zinc-500 mt-1">Manage your team members and their account permissions here.</p>
+        </div>
+        <div className="relative w-full sm:w-72">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-zinc-400" />
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-10 pr-3 py-2 border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-shadow"
+            placeholder="Search by email..."
+            value={searchEmail}
+            onChange={(e) => setSearchEmail(e.target.value)}
+          />
         </div>
       </div>
 
@@ -99,6 +126,25 @@ const UserManagement = () => {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="p-4 border-t border-zinc-200 flex items-center justify-between bg-zinc-50">
+          <button
+            disabled={currentPage === 0}
+            onClick={() => getAllUser(currentPage - 1)}
+            className="px-4 py-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-300 rounded-lg hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Previous
+          </button>
+          <span className="text-sm text-zinc-600 font-medium">
+            Page {currentPage + 1} of {totalPages === 0 ? 1 : totalPages}
+          </span>
+          <button
+            disabled={currentPage >= totalPages - 1}
+            onClick={() => getAllUser(currentPage + 1)}
+            className="px-4 py-2 text-sm font-medium text-zinc-700 bg-white border border-zinc-300 rounded-lg hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>

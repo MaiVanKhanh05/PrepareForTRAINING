@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.backend.Entity.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import com.example.backend.Repository.UserRepository;
 
 @Service
@@ -15,8 +17,12 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Page<User> getAllUsers(String email, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        if (email != null && !email.trim().isEmpty()) {
+            return userRepository.findByEmailContainingIgnoreCase(email, pageRequest);
+        }
+        return userRepository.findAll(pageRequest);
     }
 
     public void deleteUserById(String id) {
