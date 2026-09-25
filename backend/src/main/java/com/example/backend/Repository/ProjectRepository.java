@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.example.backend.DTO.Project.ProjectResponse;
 import com.example.backend.Entity.Project;
 
+
 public interface ProjectRepository
         extends JpaRepository<Project, String> {
 
@@ -51,6 +52,6 @@ public interface ProjectRepository
             p.owner.full_name,
             p.createdAt
     """)
-    ProjectResponse findProjectById(String id);
+    ProjectResponse findProjectById(@org.springframework.data.repository.query.Param("id") String id);
     
 }

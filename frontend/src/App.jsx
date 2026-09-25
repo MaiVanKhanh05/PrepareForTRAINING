@@ -14,6 +14,7 @@ import Team from './pages/owner/Team';
 import UserProjects from './pages/user/Projects';
 import UserProjectDetail from './pages/user/UserProjectDetail';
 import UserTaskDetail from './pages/user/UserTaskDetail';
+import Chatbot from './pages/user/Chatbot';
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
         <Route path="/home" element={<Home />}>
           <Route index element={<HomeDashboard />} />
           <Route path="projects" element={<UserProjects />} />
-          {/* Add more routes here later like documents, chat etc */}
+          <Route path="chat" element={<Chatbot />} />
         </Route>
 
         <Route path="/admin" element={<Admin />}>

@@ -157,8 +157,24 @@ const Team = () => {
                       {new Date(member.joinedAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <button className="text-zinc-400 hover:text-zinc-600 p-2 rounded-lg hover:bg-zinc-100 transition-colors">
-                        <MoreVertical className="h-5 w-5" />
+                      <button 
+                        onClick={async () => {
+                          if (window.confirm("Are you sure you want to remove this member from the project?")) {
+                            try {
+                              await axios.delete(`http://localhost:8080/api/projects/${selectedProjectId}/members/${member.memberId}`, {
+                                headers: { Authorization: 'Bearer ' + token }
+                              });
+                              setMembers(members.filter(m => m.memberId !== member.memberId));
+                              alert("Member removed successfully");
+                            } catch (error) {
+                              console.error(error);
+                              alert("Failed to remove member");
+                            }
+                          }
+                        }}
+                        className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors font-medium text-sm"
+                      >
+                        Remove
                       </button>
                     </td>
                   </tr>

@@ -128,6 +128,22 @@ function UserTaskDetail() {
         );
     }
 
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const isAssignee = task && user.id === task.assignedTo;
+
+    const handleStatusChange = async (newStatus) => {
+        try {
+            await axios.put(`http://localhost:8080/api/tasks/${taskId}`, 
+                { status: newStatus },
+                { headers: { Authorization: 'Bearer ' + token } }
+            );
+            setTask({ ...task, status: newStatus });
+        } catch (error) {
+            console.error("Failed to update status", error);
+            alert("Failed to update task status.");
+        }
+    };
+
     let color = 'zinc';
     let displayStatus = 'To Do';
     if (task.status === 'IN_PROGRESS') {
@@ -150,9 +166,22 @@ function UserTaskDetail() {
 
             <div className="bg-white rounded-3xl p-8 border border-zinc-200 shadow-sm">
                 <div className="flex items-center gap-3 mb-4">
-                     <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-${color}-100 text-${color}-700 border border-${color}-200`}>
-                        {displayStatus}
-                    </span>
+                    {isAssignee ? (
+                        <select
+                            value={task.status}
+                            onChange={(e) => handleStatusChange(e.target.value)}
+                            className={`px-3 py-1 rounded-full text-xs font-semibold bg-${color}-100 text-${color}-700 border border-${color}-200 outline-none cursor-pointer appearance-none text-center`}
+                            style={{ WebkitAppearance: 'none', MozAppearance: 'none' }}
+                        >
+                            <option value="TODO">To Do</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="DONE">Completed</option>
+                        </select>
+                    ) : (
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-${color}-100 text-${color}-700 border border-${color}-200`}>
+                            {displayStatus}
+                        </span>
+                    )}
                     <h1 className="text-2xl font-bold text-zinc-900">{task.title}</h1>
                 </div>
                 
@@ -228,7 +257,11 @@ function UserTaskDetail() {
                                         </div>
                                         <div className="min-w-0">
                                             <p className="font-semibold text-zinc-900 text-sm truncate" title={file.originalName}>{file.originalName}</p>
-                                            <p className="text-xs text-zinc-500">{(file.fileSize / 1024 / 1024).toFixed(2)} MB</p>
+                                            <p className="text-xs text-zinc-500 mt-0.5">
+                                                {(file.fileSize / 1024 / 1024).toFixed(2)} MB
+                                                {file.uploadedBy && ` • By: ${file.uploadedBy}`}
+                                                {file.uploadedAt && ` • ${new Date(file.uploadedAt).toLocaleString()}`}
+                                            </p>
                                         </div>
                                     </div>
                                     <button 

@@ -48,9 +48,6 @@ public class TaskService {
                 throw new AppException(HttpStatus.BAD_REQUEST, "Assigned user does not exist");
             }
             User assignee = assigneeOpt.get();
-            if (!"USER".equals(assignee.getRole())) {
-                throw new AppException(HttpStatus.BAD_REQUEST, "Assigned user must have role USER");
-            }
 
             List<ProjectMember> membership = projectMemberRepository.findByProjectIdAndMemberId(request.getProjectId(), request.getAssignedTo());
             if (membership.isEmpty()) {
@@ -88,9 +85,6 @@ public class TaskService {
                 throw new AppException(HttpStatus.BAD_REQUEST, "Assigned user does not exist");
             }
             User assignee = assigneeOpt.get();
-            if (!"USER".equals(assignee.getRole())) {
-                throw new AppException(HttpStatus.BAD_REQUEST, "Assigned user must have role USER");
-            }
 
             List<ProjectMember> membership = projectMemberRepository.findByProjectIdAndMemberId(task.getProjectId(), request.getAssignedTo());
             if (membership.isEmpty()) {

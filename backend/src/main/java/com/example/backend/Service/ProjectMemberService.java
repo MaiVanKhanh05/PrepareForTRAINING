@@ -37,6 +37,19 @@ public class ProjectMemberService {
 
     //Create new project
     public void AddMemberToProject(CreateProjectRequest CreateProjectRequest) {
+        // Add owner as a member automatically
+        Optional<User> ownerOpt = userRepository.findById(CreateProjectRequest.getOwner_id());
+        if (ownerOpt.isPresent()) {
+            ProjectMember ownerMember = new ProjectMember();
+            ownerMember.setId(java.util.UUID.randomUUID().toString());
+            ownerMember.setProjectId(CreateProjectRequest.getId());
+            ownerMember.setMemberId(ownerOpt.get().getId());
+            ownerMember.setMemberName(ownerOpt.get().getFull_name());
+            ownerMember.setJoinedAt(new Date());
+            ownerMember.setRole("OWNER");
+            projectMemberRepository.save(ownerMember);
+        }
+
         if (CreateProjectRequest.getEmail() != null) {
             for (String email : CreateProjectRequest.getEmail()) {
                 InviteMemberToProject(CreateProjectRequest.getId(), email);
@@ -59,10 +72,6 @@ public class ProjectMemberService {
             throw new AppException(HttpStatus.CONFLICT,
                     "User " + email + " đã là thành viên của dự án");
         }
-        if (!user.get().getRole().equals("USER")) {
-            throw new AppException(HttpStatus.FORBIDDEN,
-                    "Email " + email + " không có quyền");
-        }
 
         ProjectMember projectMember = new ProjectMember();
         projectMember.setId(java.util.UUID.randomUUID().toString());
@@ -73,4 +82,23 @@ public class ProjectMemberService {
         projectMemberRepository.save(projectMember);
     }
 
+    @org.springframework.transaction.annotation.Transactional
+    public void removeMemberFromProject(String projectId, String memberId) {
+        List<ProjectMember> membership = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId);
+        if (membership.isEmpty()) {
+            throw new AppException(HttpStatus.NOT_FOUND, "Member is not in the project");
+        }
+        projectMemberRepository.deleteByProjectIdAndMemberId(projectId, memberId);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void changeMemberRole(String projectId, String memberId, String newRole) {
+        List<ProjectMember> membership = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId);
+        if (membership.isEmpty()) {
+            throw new AppException(HttpStatus.NOT_FOUND, "Member is not in the project");
+        }
+        ProjectMember projectMember = membership.get(0);
+        projectMember.setRole(newRole);
+        projectMemberRepository.save(projectMember);
+    }
 }

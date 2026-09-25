@@ -160,9 +160,7 @@ const ProjectDetail = () => {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: LayoutGrid },
     { id: 'tasks', label: 'Tasks', icon: CheckCircle2 },
-    { id: 'files', label: 'Files', icon: FileText },
     { id: 'members', label: 'Members', icon: Users },
-    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
 

@@ -1,66 +1,241 @@
-import React from 'react';
-import { Users, Activity, CreditCard, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-
-const StatCard = ({ title, value, icon: Icon, trend, trendValue, colorClass }) => (
-  <div className="bg-white rounded-2xl p-6 border border-zinc-100 shadow-sm hover:shadow-md transition-shadow">
-    <div className="flex items-start justify-between">
-      <div>
-        <p className="text-zinc-500 text-sm font-medium mb-1">{title}</p>
-        <h3 className="text-3xl font-bold text-zinc-900">{value}</h3>
-      </div>
-      <div className={`p-3 rounded-xl ${colorClass}`}>
-        <Icon className="h-6 w-6" />
-      </div>
-    </div>
-    <div className="mt-4 flex items-center gap-2">
-      <div className={`flex items-center text-sm font-medium ${trend === 'up' ? 'text-emerald-600' : 'text-red-600'}`}>
-        {trend === 'up' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
-        <span>{trendValue}</span>
-      </div>
-      <span className="text-zinc-400 text-sm">vs last month</span>
-    </div>
-  </div>
-);
+import React, { useState, useEffect } from 'react';
+import { UserPlus, MoreVertical, Mail, Folder } from 'lucide-react';
+import axios from 'axios';
 
 const Dashboard = () => {
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [selectedProjectId, setSelectedProjectId] = useState('');
+  const [members, setMembers] = useState([]);
+  const [inviteEmail, setInviteEmail] = useState('');
+
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/api/projects', {
+          headers: { Authorization: 'Bearer ' + token }
+        });
+        setProjects(response.data);
+        if (response.data.length > 0) {
+          setSelectedProjectId(response.data[0].id);
+        }
+      } catch (error) {
+        console.error("Failed to fetch projects", error);
+      }
+    };
+    fetchProjects();
+  }, [token]);
+
+  useEffect(() => {
+    const fetchMembers = async () => {
+      if (!selectedProjectId) {
+        setMembers([]);
+        return;
+      }
+      try {
+        const response = await axios.get('http://localhost:8080/api/projects/detail/' + selectedProjectId, {
+          headers: { Authorization: 'Bearer ' + token }
+        });
+        if (response.data && response.data.members) {
+          setMembers(response.data.members);
+        } else {
+          setMembers([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch project details", error);
+        setMembers([]);
+      }
+    };
+    fetchMembers();
+  }, [selectedProjectId, token]);
+
+  const handleInvite = async (e) => {
+    e.preventDefault();
+    if (!inviteEmail || !selectedProjectId) {
+      alert("Invalid email or no project selected");
+      return;
+    }
+    try {
+      await axios.post(
+        'http://localhost:8080/api/projects/invite',
+        { email: inviteEmail, projectId: selectedProjectId },
+        { headers: { Authorization: 'Bearer ' + token } }
+      );
+      alert("Invitation sent successfully!");
+      setInviteEmail('');
+      setIsInviteOpen(false);
+
+      const response = await axios.get('http://localhost:8080/api/projects/detail/' + selectedProjectId, {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      if (response.data && response.data.members) {
+        setMembers(response.data.members);
+      }
+    } catch (error) {
+      console.error(error);
+      if (error.response) {
+        alert(error.response.data.message);
+      } else {
+        alert("Something went wrong");
+      }
+    }
+  };
+
+  const handleRoleChange = async (memberId, newRole) => {
+    try {
+      await axios.put(
+        `http://localhost:8080/api/projects/${selectedProjectId}/members/${memberId}/role`,
+        { role: newRole },
+        { headers: { Authorization: 'Bearer ' + token } }
+      );
+      setMembers(members.map(m => m.memberId === memberId ? { ...m, role: newRole } : m));
+      alert(`Role updated successfully to ${newRole}`);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to update member role");
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-zinc-900">Dashboard Overview</h1>
-        <p className="text-zinc-500 mt-1">Welcome back, here's what's happening today.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-zinc-900">Project Management</h1>
+          <p className="text-zinc-500 mt-1">Manage all projects, add members, change roles, or remove members.</p>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Folder className="h-4 w-4 text-zinc-400" />
+            </div>
+            <select
+              value={selectedProjectId}
+              onChange={(e) => setSelectedProjectId(e.target.value)}
+              className="pl-10 pr-8 py-2 w-full sm:w-64 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white appearance-none"
+            >
+              <option value="">Select a project</option>
+              {projects.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          </div>
+          <button
+            onClick={() => setIsInviteOpen(true)}
+            disabled={!selectedProjectId}
+            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm shadow-indigo-200"
+          >
+            <UserPlus className="h-5 w-5" />
+            Invite Member
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <StatCard
-          title="Total Users"
-          value="12,426"
-          icon={Users}
-          trend="up"
-          trendValue="12.5%"
-          colorClass="bg-indigo-50 text-indigo-600"
-        />
-        <StatCard
-          title="Active Sessions"
-          value="892"
-          icon={Activity}
-          trend="up"
-          trendValue="5.2%"
-          colorClass="bg-emerald-50 text-emerald-600"
-        />
-        <StatCard
-          title="Monthly Revenue"
-          value="$45,231"
-          icon={CreditCard}
-          trend="down"
-          trendValue="2.4%"
-          colorClass="bg-rose-50 text-rose-600"
-        />
+      <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-zinc-50 border-b border-zinc-200 text-zinc-500 text-sm font-medium">
+                <th className="px-6 py-4">Member</th>
+                <th className="px-6 py-4">Role</th>
+                <th className="px-6 py-4">Joined</th>
+                <th className="px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-200">
+              {members.length === 0 ? (
+                <tr>
+                  <td colSpan="4" className="px-6 py-10 text-center text-zinc-500">
+                    No members found in this project.
+                  </td>
+                </tr>
+              ) : (
+                members.map((member) => (
+                  <tr key={member.id} className="hover:bg-zinc-50/50 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <img src={member.avatar || `https://i.pravatar.cc/100?u=${member.memberId || member.id}`} alt={member.Name} className="h-10 w-10 rounded-full object-cover border border-zinc-200" />
+                        <div>
+                          <div className="font-medium text-zinc-900">{member.Name || 'Unknown User'}</div>
+                          <div className="text-sm text-zinc-500">{member.memberId}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <select
+                        value={member.role || 'MEMBER'}
+                        onChange={(e) => handleRoleChange(member.memberId, e.target.value)}
+                        className="inline-flex items-center px-2 py-1 rounded-lg text-sm font-medium bg-zinc-50 text-zinc-800 border border-zinc-200 outline-none cursor-pointer"
+                      >
+                        <option value="MEMBER">Member</option>
+                        <option value="OWNER">Owner</option>
+                      </select>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-zinc-500">
+                      {new Date(member.joinedAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={async () => {
+                          if (window.confirm("Are you sure you want to remove this member from the project?")) {
+                            try {
+                              await axios.delete(`http://localhost:8080/api/projects/${selectedProjectId}/members/${member.memberId}`, {
+                                headers: { Authorization: 'Bearer ' + token }
+                              });
+                              setMembers(members.filter(m => m.memberId !== member.memberId));
+                              alert("Member removed successfully");
+                            } catch (error) {
+                              console.error(error);
+                              alert("Failed to remove member");
+                            }
+                          }
+                        }}
+                        className="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-colors font-medium text-sm"
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Placeholder for a chart or recent activity */}
-      <div className="bg-white rounded-2xl border border-zinc-100 p-6 shadow-sm min-h-[400px] flex items-center justify-center">
-        <p className="text-zinc-400">Activity Chart Placeholder</p>
-      </div>
+      {isInviteOpen && (
+        <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <form onSubmit={handleInvite}>
+              <div className="p-6 border-b border-zinc-100">
+                <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-4">
+                  <Mail className="h-6 w-6" />
+                </div>
+                <h2 className="text-xl font-bold text-zinc-900">Invite Team Member</h2>
+                <p className="text-zinc-500 text-sm mt-1">Send an invitation email to add someone to the current project.</p>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-700 mb-1">Email Address</label>
+                  <input
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    required
+                    className="w-full px-3 py-2 border border-zinc-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+                    placeholder="colleague@company.com"
+                  />
+                </div>
+              </div>
+              <div className="p-4 bg-zinc-50 border-t border-zinc-100 flex justify-end gap-3">
+                <button type="button" onClick={() => setIsInviteOpen(false)} className="px-4 py-2 text-zinc-600 font-medium hover:bg-zinc-200/50 rounded-lg transition-colors">Cancel</button>
+                <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors shadow-sm shadow-indigo-200">Send Invite</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -8,4 +8,5 @@ import com.example.backend.Entity.Task;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, String> {
     List<Task> findByProjectId(String projectId);
+    void deleteByProjectId(String projectId);
 }

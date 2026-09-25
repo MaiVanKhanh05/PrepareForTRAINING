@@ -32,4 +32,15 @@ public class UserService {
     public boolean checkEmailExists(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
+
+    public void updateUserRole(String userId, String newRole) {
+        java.util.Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            user.setRole(newRole);
+            userRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
 }

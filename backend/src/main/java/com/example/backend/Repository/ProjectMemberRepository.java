@@ -15,6 +15,8 @@ public interface ProjectMemberRepository extends JpaRepository<ProjectMember, St
 
     void deleteByProjectId(String projectId);
 
+    void deleteByProjectIdAndMemberId(String projectId, String memberId);
+
     @Query("""
         SELECT new com.example.backend.DTO.Project.ProjectResponse(
             p.id,

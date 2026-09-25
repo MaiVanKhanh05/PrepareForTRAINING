@@ -23,11 +23,13 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
+    private final com.example.backend.Repository.TaskRepository taskRepository;
 
-    public ProjectService(ProjectRepository projectRepository, UserRepository userRepository, ProjectMemberRepository projectMemberRepository) {
+    public ProjectService(ProjectRepository projectRepository, UserRepository userRepository, ProjectMemberRepository projectMemberRepository, com.example.backend.Repository.TaskRepository taskRepository) {
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.projectMemberRepository = projectMemberRepository;
+        this.taskRepository = taskRepository;
     }
 
     public List<ProjectResponse> getAllProjects() {
@@ -45,7 +47,10 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public void deleteProjectById(String id) {
+        taskRepository.deleteByProjectId(id);
+        projectMemberRepository.deleteByProjectId(id);
         projectRepository.deleteById(id);
     }
 

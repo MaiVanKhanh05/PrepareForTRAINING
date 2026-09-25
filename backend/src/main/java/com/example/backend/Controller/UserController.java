@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,5 +45,15 @@ public class UserController {
     @GetMapping("/check-email")
     public boolean checkEmailExists(@RequestParam String email) {
         return userService.checkEmailExists(email);
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/{id}/role")
+    public String updateUserRole(@PathVariable String id, @RequestBody java.util.Map<String, String> body) {
+        String newRole = body.get("role");
+        if (newRole != null) {
+            userService.updateUserRole(id, newRole);
+            return "User role updated successfully";
+        }
+        throw new RuntimeException("Role is missing");
     }
 }

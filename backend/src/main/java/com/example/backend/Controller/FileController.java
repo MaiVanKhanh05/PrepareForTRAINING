@@ -28,4 +28,16 @@ public class FileController {
     public ResponseEntity<List<FileResponse>> getFilesByProject(@PathVariable String projectId) {
         return ResponseEntity.ok(fileService.getFilesByProject(projectId));
     }
+
+    @PostMapping("/extract-text")
+    public ResponseEntity<java.util.Map<String, String>> extractText(@RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        try {
+            org.apache.tika.Tika tika = new org.apache.tika.Tika();
+            String content = tika.parseToString(file.getInputStream());
+            return ResponseEntity.ok(java.util.Map.of("text", content));
+        } catch (Exception e) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(java.util.Map.of("error", "Failed to parse file: " + e.getMessage()));
+        }
+    }
 }

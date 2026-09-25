@@ -110,7 +110,30 @@ const UserManagement = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-zinc-600">{user.role}</span>
+                    <select
+                      value={user.role}
+                      onChange={async (e) => {
+                        const newRole = e.target.value;
+                        if (window.confirm(`Change role to ${newRole}?`)) {
+                          try {
+                            await axios.put(`http://localhost:8080/api/users/${user.id}/role`, 
+                              { role: newRole },
+                              { headers: { Authorization: 'Bearer ' + token } }
+                            );
+                            setUsers(users.map(u => u.id === user.id ? { ...u, role: newRole } : u));
+                            alert("Role updated successfully");
+                          } catch (error) {
+                            console.error(error);
+                            alert("Failed to update role");
+                          }
+                        }
+                      }}
+                      className="inline-flex items-center px-2 py-1 rounded-lg text-sm font-medium bg-zinc-50 text-zinc-800 border border-zinc-200 outline-none cursor-pointer"
+                    >
+                      <option value="USER">User</option>
+                      <option value="OWNER">Owner</option>
+                      <option value="ADMIN">Admin</option>
+                    </select>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

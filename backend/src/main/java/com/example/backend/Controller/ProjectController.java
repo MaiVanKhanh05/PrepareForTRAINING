@@ -58,6 +58,22 @@ public class ProjectController {
         projectMemberService.InviteMemberToProject(invitedProjectRequest.getProjectId(), invitedProjectRequest.getEmail());
     }
 
+    @DeleteMapping("/{projectId}/members/{memberId}")
+    public String removeMemberFromProject(@PathVariable String projectId, @PathVariable String memberId) {
+        projectMemberService.removeMemberFromProject(projectId, memberId);
+        return "Member removed successfully";
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/{projectId}/members/{memberId}/role")
+    public String updateProjectMemberRole(@PathVariable String projectId, @PathVariable String memberId, @RequestBody java.util.Map<String, String> body) {
+        String newRole = body.get("role");
+        if (newRole != null) {
+            projectMemberService.changeMemberRole(projectId, memberId, newRole);
+            return "Project member role updated successfully";
+        }
+        throw new RuntimeException("Role is missing");
+    }
+
     @GetMapping("/{userId}")
     public List<ProjectResponse> getMyProjects(@PathVariable String userId) {
         return projectService.getMyProjects(userId);

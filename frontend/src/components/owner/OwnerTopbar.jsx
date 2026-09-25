@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bell, User, Menu } from 'lucide-react';
+import { Bell, User, Menu } from 'lucide-react';
 
 const OwnerTopbar = () => {
   return (
@@ -8,14 +8,7 @@ const OwnerTopbar = () => {
         <button className="lg:hidden p-2 text-zinc-500 hover:bg-zinc-100 rounded-lg">
           <Menu className="h-5 w-5" />
         </button>
-        <div className="relative hidden sm:block">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
-          <input
-            type="text"
-            placeholder="Search projects or members..."
-            className="pl-10 pr-4 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all w-72"
-          />
-        </div>
+
       </div>
 
       <div className="flex items-center gap-4">

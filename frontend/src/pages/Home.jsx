@@ -4,7 +4,6 @@ import {
   Folder,
   FileText,
   Settings,
-  Search,
   Bell,
   Layout,
   MessageSquare,
@@ -14,9 +13,9 @@ import {
 function Home() {
   const navigate = useNavigate();
   const location = useLocation();
-  const activeTab = location.pathname.includes('/home/projects') ? 'projects' : 
-                    location.pathname.includes('/home/documents') ? 'documents' : 
-                    location.pathname.includes('/home/chat') ? 'chat' : 'dashboard';
+  const activeTab = location.pathname.includes('/home/projects') ? 'projects' :
+    location.pathname.includes('/home/documents') ? 'documents' :
+      location.pathname.includes('/home/chat') ? 'chat' : 'dashboard';
 
   const user = JSON.parse(localStorage.getItem('user'));
 
@@ -52,13 +51,7 @@ function Home() {
             <Folder className={`w-5 h-5 mr-3 ${activeTab === 'projects' ? 'text-indigo-600' : 'text-slate-400'}`} />
             Projects
           </button>
-          <button
-            onClick={() => navigate('/home/documents')}
-            className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'documents' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
-          >
-            <FileText className={`w-5 h-5 mr-3 ${activeTab === 'documents' ? 'text-indigo-600' : 'text-slate-400'}`} />
-            Documents
-          </button>
+
           <button
             onClick={() => navigate('/home/chat')}
             className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === 'chat' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
@@ -88,16 +81,6 @@ function Home() {
         {/* Header */}
         <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-6 z-10 sticky top-0">
           <div className="flex-1 max-w-xl flex items-center">
-            <div className="relative w-full group">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-              </span>
-              <input
-                type="text"
-                placeholder="Search projects, documents, team members..."
-                className="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg leading-5 bg-slate-50/50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 sm:text-sm transition-all duration-200 shadow-sm"
-              />
-            </div>
           </div>
 
           <div className="ml-4 flex items-center space-x-5">
